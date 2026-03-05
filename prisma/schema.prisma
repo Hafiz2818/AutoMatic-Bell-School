@@ -23,6 +23,7 @@ model User {
 model AppIdentity {
   id          String   @id @default(cuid())
   schoolName  String   @default("Sekolah")
+  description String?
   address     String?
   logoUrl     String?
   updatedAt   DateTime @updatedAt

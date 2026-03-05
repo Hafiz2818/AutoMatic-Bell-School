@@ -24,6 +24,7 @@ import {
 type AppIdentity = {
   id?: string
   schoolName: string
+  description?: string
   address?: string
   logoUrl?: string
 }
@@ -202,13 +203,6 @@ function GuestPage({
   onAdminLogin: () => void
   onPetugasLogin: () => void
 }) {
-  const [currentTime, setCurrentTime] = useState(new Date())
-
-  useEffect(() => {
-    const timer = setInterval(() => setCurrentTime(new Date()), 1000)
-    return () => clearInterval(timer)
-  }, [])
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex flex-col">
       {/* Header */}
@@ -241,52 +235,86 @@ function GuestPage({
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 flex items-center justify-center p-8">
-        <div className="text-center space-y-8 max-w-4xl">
-          {/* Logo & Name */}
-          <div className="flex flex-col items-center gap-6">
-            {identity?.logoUrl ? (
-              <img src={identity.logoUrl} alt="Logo" className="w-32 h-32 object-contain rounded-2xl bg-white p-3 shadow-2xl" />
-            ) : (
-              <div className="w-32 h-32 bg-gradient-to-br from-amber-500 to-orange-600 rounded-2xl flex items-center justify-center shadow-2xl">
-                <School className="w-16 h-16 text-white" />
+      <main className="flex-1 flex items-center justify-center p-4 md:p-8">
+        <div className="w-full max-w-6xl">
+          {/* School Profile Card */}
+          <Card className="bg-white/10 backdrop-blur-md border-white/20 shadow-2xl mb-8">
+            <CardContent className="p-8">
+              <div className="flex flex-col md:flex-row items-center gap-8">
+                {/* Logo */}
+                <div className="flex-shrink-0">
+                  {identity?.logoUrl ? (
+                    <div className="w-40 h-40 md:w-48 md:h-48 rounded-2xl bg-white p-3 shadow-xl flex items-center justify-center">
+                      <img src={identity.logoUrl} alt="Logo Sekolah" className="w-full h-full object-contain" />
+                    </div>
+                  ) : (
+                    <div className="w-40 h-40 md:w-48 md:h-48 bg-gradient-to-br from-amber-500 to-orange-600 rounded-2xl flex items-center justify-center shadow-xl">
+                      <School className="w-20 h-20 text-white" />
+                    </div>
+                  )}
+                </div>
+                
+                {/* Info */}
+                <div className="flex-1 text-center md:text-left">
+                  <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">
+                    {identity?.schoolName || "Nama Sekolah"}
+                  </h1>
+                  
+                  {identity?.description && (
+                    <p className="text-lg text-white/80 mb-4 leading-relaxed">
+                      {identity.description}
+                    </p>
+                  )}
+                  
+                  {identity?.address && (
+                    <div className="flex items-center justify-center md:justify-start gap-2 text-white/60">
+                      <MapPin className="w-5 h-5" />
+                      <span>{identity.address}</span>
+                    </div>
+                  )}
+                  
+                  {!identity?.description && !identity?.address && (
+                    <p className="text-white/50 italic">
+                      Klik tombol Admin untuk mengelola profil sekolah
+                    </p>
+                  )}
+                </div>
               </div>
-            )}
-            <div>
-              <h1 className="text-4xl md:text-5xl font-bold text-white mb-2">{identity?.schoolName || "Sistem Bel Sekolah"}</h1>
-              {identity?.address && (
-                <p className="text-lg text-white/60 flex items-center justify-center gap-2">
-                  <MapPin className="w-5 h-5" />
-                  {identity.address}
-                </p>
-              )}
-            </div>
-          </div>
+            </CardContent>
+          </Card>
 
           {/* Clock */}
-          <div className="py-8">
-            <RealTimeClock large />
-          </div>
+          <Card className="bg-white/10 backdrop-blur-md border-white/20 shadow-2xl mb-8">
+            <CardContent className="py-10">
+              <RealTimeClock large />
+            </CardContent>
+          </Card>
 
-          {/* Description */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
-            <Card className="bg-white/10 backdrop-blur border-white/20">
+          {/* Features */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <Card className="bg-white/10 backdrop-blur border-white/20 hover:bg-white/15 transition-colors">
               <CardContent className="pt-6 text-center">
-                <Bell className="w-12 h-12 text-amber-400 mx-auto mb-4" />
+                <div className="w-16 h-16 bg-gradient-to-br from-amber-500 to-orange-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <Bell className="w-8 h-8 text-white" />
+                </div>
                 <h3 className="text-lg font-semibold text-white">Bel Otomatis</h3>
                 <p className="text-white/60 text-sm mt-2">Sistem bel otomatis berdasarkan jadwal yang telah ditentukan</p>
               </CardContent>
             </Card>
-            <Card className="bg-white/10 backdrop-blur border-white/20">
+            <Card className="bg-white/10 backdrop-blur border-white/20 hover:bg-white/15 transition-colors">
               <CardContent className="pt-6 text-center">
-                <Calendar className="w-12 h-12 text-amber-400 mx-auto mb-4" />
+                <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <Calendar className="w-8 h-8 text-white" />
+                </div>
                 <h3 className="text-lg font-semibold text-white">Jadwal Terstruktur</h3>
                 <p className="text-white/60 text-sm mt-2">Pengaturan jadwal bel per hari dan waktu dengan mudah</p>
               </CardContent>
             </Card>
-            <Card className="bg-white/10 backdrop-blur border-white/20">
+            <Card className="bg-white/10 backdrop-blur border-white/20 hover:bg-white/15 transition-colors">
               <CardContent className="pt-6 text-center">
-                <Music className="w-12 h-12 text-amber-400 mx-auto mb-4" />
+                <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-violet-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <Music className="w-8 h-8 text-white" />
+                </div>
                 <h3 className="text-lg font-semibold text-white">Audio Kustom</h3>
                 <p className="text-white/60 text-sm mt-2">Upload dan gunakan audio bel sesuai keinginan</p>
               </CardContent>
@@ -296,9 +324,9 @@ function GuestPage({
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-white/10 backdrop-blur-sm bg-black/20 py-4">
-        <div className="container mx-auto px-4 text-center text-white/60 text-sm">
-          <p>© 2024 Sistem Bel Sekolah Otomatis | Dikembangkan untuk kebutuhan pendidikan</p>
+      <footer className="border-t border-white/10 backdrop-blur-sm bg-black/20 py-6">
+        <div className="container mx-auto px-4 text-center">
+          <p className="text-white/60 text-sm">© 2024 Sistem Bel Sekolah Otomatis | Dikembangkan untuk kebutuhan pendidikan</p>
         </div>
       </footer>
     </div>
@@ -712,6 +740,7 @@ function AdminDashboard({
   // Identity Form
   const IdentityForm = () => {
     const [schoolName, setSchoolName] = useState(identity?.schoolName || "")
+    const [description, setDescription] = useState(identity?.description || "")
     const [address, setAddress] = useState(identity?.address || "")
     const [logoFile, setLogoFile] = useState<File | null>(null)
     const [loading, setLoading] = useState(false)
@@ -720,6 +749,7 @@ function AdminDashboard({
     useEffect(() => {
       if (identity) {
         setSchoolName(identity.schoolName || "")
+        setDescription(identity.description || "")
         setAddress(identity.address || "")
         setPreview(identity.logoUrl || null)
       }
@@ -741,16 +771,21 @@ function AdminDashboard({
       try {
         const formData = new FormData()
         formData.append("schoolName", schoolName)
+        formData.append("description", description)
         formData.append("address", address)
         if (logoFile) formData.append("logo", logoFile)
 
         const res = await fetch("/api/identity", { method: "POST", body: formData })
-        if (!res.ok) throw new Error("Failed")
+        if (!res.ok) {
+          const errorData = await res.json()
+          throw new Error(errorData.details || "Failed to save")
+        }
 
         toast({ title: "Berhasil", description: "Identitas sekolah diperbarui" })
+        setLogoFile(null) // Reset file after successful upload
         onUpdate()
-      } catch {
-        toast({ title: "Error", description: "Gagal memperbarui", variant: "destructive" })
+      } catch (err) {
+        toast({ title: "Error", description: err instanceof Error ? err.message : "Gagal memperbarui", variant: "destructive" })
       } finally {
         setLoading(false)
       }
@@ -763,36 +798,68 @@ function AdminDashboard({
             <Settings className="w-5 h-5 text-amber-500" />
             Identitas Sekolah
           </CardTitle>
+          <CardDescription>Kelola informasi dan logo sekolah</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="flex flex-col md:flex-row gap-6">
               <div className="flex-shrink-0">
-                <div className="w-32 h-32 border-2 border-dashed rounded-xl flex items-center justify-center bg-slate-50 overflow-hidden">
-                  {preview ? (
-                    <img src={preview} alt="Logo" className="w-full h-full object-contain" />
-                  ) : (
-                    <School className="w-12 h-12 text-muted-foreground" />
-                  )}
-                </div>
-                <Label className="mt-2 block text-center cursor-pointer">
-                  <span className="text-sm text-amber-600">Upload Logo</span>
-                  <input type="file" accept="image/*" onChange={handleLogoChange} className="hidden" />
-                </Label>
+                <label htmlFor="logo-input" className="block cursor-pointer">
+                  <div className="w-40 h-40 border-2 border-dashed rounded-xl flex items-center justify-center bg-slate-50 overflow-hidden hover:bg-slate-100 transition-colors hover:border-amber-400">
+                    {preview ? (
+                      <img src={preview} alt="Logo" className="w-full h-full object-contain" />
+                    ) : (
+                      <div className="text-center">
+                        <Upload className="w-10 h-10 text-muted-foreground mx-auto mb-2" />
+                        <p className="text-xs text-muted-foreground">Klik untuk upload</p>
+                      </div>
+                    )}
+                  </div>
+                </label>
+                <input 
+                  type="file" 
+                  accept="image/*" 
+                  onChange={handleLogoChange} 
+                  className="hidden" 
+                  id="logo-input"
+                />
+                <p className="text-xs text-muted-foreground text-center mt-2">
+                  PNG, JPG, JPEG (Max 5MB)
+                </p>
               </div>
               <div className="flex-1 space-y-4">
                 <div className="space-y-2">
-                  <Label>Nama Sekolah</Label>
-                  <Input value={schoolName} onChange={(e) => setSchoolName(e.target.value)} />
+                  <Label htmlFor="schoolName">Nama Sekolah</Label>
+                  <Input 
+                    id="schoolName"
+                    value={schoolName} 
+                    onChange={(e) => setSchoolName(e.target.value)} 
+                    placeholder="Nama Sekolah"
+                  />
                 </div>
                 <div className="space-y-2">
-                  <Label>Alamat</Label>
-                  <Input value={address} onChange={(e) => setAddress(e.target.value)} />
+                  <Label htmlFor="description">Deskripsi</Label>
+                  <textarea
+                    id="description"
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    placeholder="Deskripsi singkat tentang sekolah..."
+                    className="w-full min-h-[100px] px-3 py-2 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="address">Alamat</Label>
+                  <Input 
+                    id="address"
+                    value={address} 
+                    onChange={(e) => setAddress(e.target.value)} 
+                    placeholder="Alamat lengkap sekolah"
+                  />
                 </div>
               </div>
             </div>
             <Button type="submit" disabled={loading} className="bg-gradient-to-r from-amber-500 to-orange-600">
-              {loading ? "Menyimpan..." : "Simpan"}
+              {loading ? "Menyimpan..." : "Simpan Perubahan"}
             </Button>
           </form>
         </CardContent>
