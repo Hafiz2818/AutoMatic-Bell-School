@@ -278,8 +278,8 @@ function GuestPage({
               <Bell className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h1 className={`text-xl font-bold ${isDark ? "text-white" : "text-slate-800"}`}>Bel Sekolah Otomatis</h1>
-              <p className={`text-xs ${isDark ? "text-white/60" : "text-slate-500"}`}>Sistem Bel Digital Modern</p>
+              <h1 className={`text-xl font-bold ${isDark ? "text-white" : "text-slate-800"}`}>AutoMBell</h1>
+              <p className={`text-xs ${isDark ? "text-white/60" : "text-slate-500"}`}>Sistem Bell Digital Modern</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
@@ -333,11 +333,11 @@ function GuestPage({
                 isDark ? "bg-white/10 text-white/80" : "bg-slate-100 text-slate-600"
               }`}>
                 <Sparkles className={`w-4 h-4 text-${currentTheme.primary}-500`} />
-                <span className="text-sm font-medium">Platform Bel Sekolah Terbaik</span>
+                <span className="text-sm font-medium">Platform Bell Sekolah Terbaik</span>
               </div>
               
               <h1 className={`text-4xl md:text-6xl font-bold mb-6 ${isDark ? "text-white" : "text-slate-800"}`}>
-                Sistem <span className={`bg-gradient-to-r ${currentTheme.gradient} bg-clip-text text-transparent`}>Bel Sekolah</span> Otomatis
+                Sistem <span className={`bg-gradient-to-r ${currentTheme.gradient} bg-clip-text text-transparent`}>Bell Sekolah</span> Otomatis
               </h1>
               
               <p className={`text-lg md:text-xl mb-8 max-w-2xl mx-auto ${isDark ? "text-white/70" : "text-slate-600"}`}>
@@ -397,7 +397,7 @@ function GuestPage({
           <div className="container mx-auto px-4">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
               {[
-                { icon: Bell, title: "Bel Otomatis", desc: "Sistem bel otomatis berdasarkan jadwal yang ditentukan", color: themeColors.emerald.gradient },
+                { icon: Bell, title: "Bell Otomatis", desc: "Sistem bel otomatis berdasarkan jadwal yang ditentukan", color: themeColors.emerald.gradient },
                 { icon: Calendar, title: "Jadwal Fleksibel", desc: "Atur jadwal bel per hari dan waktu sesuai kebutuhan", color: themeColors.blue.gradient },
                 { icon: Music, title: "Audio Kustom", desc: "Upload dan gunakan audio bel sesuai keinginan", color: themeColors.violet.gradient }
               ].map((feature, i) => (

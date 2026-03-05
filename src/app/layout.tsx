@@ -15,12 +15,12 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Sistem Bel Sekolah Otomatis",
+  title: "AutoMBell",
   description: "Sistem Bel Sekolah Otomatis Berbasis Website - Kelola jadwal dan audio bel sekolah dengan mudah",
   keywords: ["Bel Sekolah", "Otomatis", "Jadwal", "Audio", "Sekolah"],
   authors: [{ name: "School Bell System" }],
   icons: {
-    icon: "/logo.svg",
+    icon: "/logo.png",
   },
 };
 
