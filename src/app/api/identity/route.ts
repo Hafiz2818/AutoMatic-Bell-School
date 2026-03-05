@@ -3,6 +3,8 @@ import { db } from "@/lib/db"
 import { writeFile, unlink } from "fs/promises"
 import { existsSync, mkdirSync } from "fs"
 import path from "path"
+import { getServerSession } from "next-auth"
+import { authOptions } from "@/lib/auth"
 
 // Ensure uploads directory exists
 const uploadsDir = path.join(process.cwd(), "public", "uploads")
@@ -12,10 +14,25 @@ if (!existsSync(uploadsDir)) {
 
 export async function GET() {
   try {
-    const identity = await db.appIdentity.findFirst()
+    const session = await getServerSession(authOptions)
+    
+    if (!session?.user?.id) {
+      return NextResponse.json({ 
+        schoolName: "Aplikasi Bel Sekolah", 
+        description: "Silakan login untuk mengelola data sekolah Anda",
+        address: "",
+        logoUrl: ""
+      })
+    }
+
+    // Use findFirst instead of findUnique for better compatibility
+    const identity = await db.appIdentity.findFirst({
+      where: { userId: session.user.id }
+    })
+
     return NextResponse.json(identity || { 
-      schoolName: "Sekolah", 
-      description: "",
+      schoolName: "Sekolah Saya", 
+      description: "Deskripsi sekolah Anda",
       address: "",
       logoUrl: ""
     })
@@ -32,6 +49,12 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
+    const session = await getServerSession(authOptions)
+    
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    }
+
     const formData = await request.formData()
     const schoolName = formData.get("schoolName") as string || "Sekolah"
     const description = formData.get("description") as string || ""
@@ -39,19 +62,18 @@ export async function POST(request: Request) {
     const logoFile = formData.get("logo") as File | null
 
     console.log("Identity POST request:", {
+      userId: session.user.id,
       schoolName,
       description,
       address,
       hasLogoFile: !!logoFile,
-      logoFileSize: logoFile?.size,
-      logoFileType: logoFile?.type
+      logoFileSize: logoFile?.size
     })
 
     let logoUrl: string | undefined = undefined
 
     // Handle logo upload
     if (logoFile && logoFile.size > 0) {
-      // Ensure uploads directory exists
       if (!existsSync(uploadsDir)) {
         mkdirSync(uploadsDir, { recursive: true })
       }
@@ -59,19 +81,19 @@ export async function POST(request: Request) {
       const bytes = await logoFile.arrayBuffer()
       const buffer = Buffer.from(bytes)
       
-      // Get file extension
       const ext = logoFile.name.split(".").pop() || "png"
-      const fileName = `logo-${Date.now()}.${ext}`
+      const fileName = `logo-${session.user.id}-${Date.now()}.${ext}`
       const filePath = path.join(uploadsDir, fileName)
       
-      console.log("Writing logo to:", filePath)
       await writeFile(filePath, buffer)
       logoUrl = `/uploads/${fileName}`
-      console.log("Logo URL:", logoUrl)
+      console.log("Logo saved:", logoUrl)
     }
 
-    // Check if identity exists
-    const existing = await db.appIdentity.findFirst()
+    // Use findFirst instead of findUnique for compatibility
+    const existing = await db.appIdentity.findFirst({
+      where: { userId: session.user.id }
+    })
 
     if (existing) {
       // Delete old logo if new one uploaded
@@ -86,6 +108,7 @@ export async function POST(request: Request) {
         }
       }
 
+      // Update using id instead of userId
       const updated = await db.appIdentity.update({
         where: { id: existing.id },
         data: {
@@ -103,7 +126,8 @@ export async function POST(request: Request) {
           schoolName,
           description,
           address,
-          logoUrl
+          logoUrl,
+          userId: session.user.id
         }
       })
       console.log("Identity created:", created)
@@ -119,6 +143,5 @@ export async function POST(request: Request) {
 }
 
 export async function PUT(request: Request) {
-  // Same as POST for this use case
   return POST(request)
 }

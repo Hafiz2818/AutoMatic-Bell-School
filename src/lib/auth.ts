@@ -1,7 +1,6 @@
 import NextAuth, { type NextAuthOptions } from "next-auth"
 import CredentialsProvider from "next-auth/providers/credentials"
 import { db } from "@/lib/db"
-import { compare } from "bcrypt"
 
 declare module "next-auth" {
   interface Session {
@@ -50,10 +49,8 @@ export const authOptions: NextAuthOptions = {
           return null
         }
 
-        // For simple password comparison (in production, use bcrypt)
-        const isValid = credentials.password === user.password
-
-        if (!isValid) {
+        // Simple password comparison (for production, use bcrypt)
+        if (credentials.password !== user.password) {
           return null
         }
 

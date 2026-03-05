@@ -1,4 +1,3 @@
-// Seed API - v2
 import { NextResponse } from "next/server"
 import { db } from "@/lib/db"
 
@@ -11,7 +10,7 @@ export async function GET() {
 
     if (!existingAdmin) {
       // Create admin user
-      await db.user.create({
+      const admin = await db.user.create({
         data: {
           email: "admin@sekolah.com",
           password: "admin123",
@@ -19,47 +18,49 @@ export async function GET() {
           role: "admin"
         }
       })
-    }
 
-    // Create default app identity
-    const existingIdentity = await db.appIdentity.findFirst()
-    if (!existingIdentity) {
+      // Create default app identity for admin
       await db.appIdentity.create({
         data: {
           schoolName: "Sekolah Negeri 1",
-          address: "Jl. Pendidikan No. 1"
+          description: "Sekolah dengan sistem bel otomatis modern",
+          address: "Jl. Pendidikan No. 1",
+          userId: admin.id
         }
+      })
+
+      // Create default access code for admin
+      const defaultCode = "ADMIN2024"
+      await db.accessCode.create({
+        data: {
+          code: defaultCode,
+          name: "Admin Default",
+          userId: admin.id
+        }
+      })
+
+      return NextResponse.json({ 
+        message: "Seed completed - Admin created",
+        admin: { email: "admin@sekolah.com", password: "admin123" },
+        defaultAccessCode: defaultCode
       })
     }
 
-    // Create default access code for petugas (handle case where model doesn't exist yet)
-    let petugasCode = "PETUGAS2024"
-    
-    if ('accessCode' in db) {
-      try {
-        const existingCode = await db.accessCode.findFirst()
-        if (!existingCode) {
-          await db.accessCode.create({
-            data: {
-              code: "PETUGAS2024",
-              name: "Petugas Jadwal Default"
-            }
-          })
-        } else {
-          petugasCode = existingCode.code
-        }
-      } catch (e) {
-        console.log("Could not create access code:", e)
-      }
-    }
+    // Get existing admin's access code
+    const accessCode = await db.accessCode.findFirst({
+      where: { userId: existingAdmin.id }
+    })
 
     return NextResponse.json({ 
-      message: "Seed completed successfully",
+      message: "Admin already exists",
       admin: { email: "admin@sekolah.com", password: "admin123" },
-      petugasCode
+      defaultAccessCode: accessCode?.code || "ADMIN2024"
     })
   } catch (error) {
     console.error("Seed error:", error)
-    return NextResponse.json({ error: "Seed failed" }, { status: 500 })
+    return NextResponse.json({ 
+      error: "Seed failed", 
+      details: error instanceof Error ? error.message : "Unknown error" 
+    }, { status: 500 })
   }
 }
